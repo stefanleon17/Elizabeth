@@ -4,7 +4,6 @@
 import json
 import re
 import string
-
 from named_entity_recognition import extract_name
 
 def read_JSON():
@@ -108,7 +107,7 @@ eliza_pairs = (
     (
         # Position 6
         # Exit case
-        r"quit",
+        "quit",
         (
             "Thank you for talking with me.",
             "Good-bye.",
@@ -160,7 +159,7 @@ eliza_pairs = (
         r"I\'m (.*)",
         (
             "How does being %1 make you feel?",
-            "Do you enjoy being %1?",
+            "How do you feel about being %1?",
             "Why do you tell me you're %1?",
             "Why do you think you're %1?",
         ),
@@ -406,6 +405,7 @@ eliza_pairs = (
         (
             "Please tell me more.",
             "Does talking about this bother you?",
+            "Does talking about this bother you?",
             "Can you elaborate on that?",
             "Why do you say that %1?",
             "I see.",
@@ -415,27 +415,23 @@ eliza_pairs = (
     )
 )
 
+def pattern_match(text, pos):
+    pattern = [text[0] for text in eliza_pairs]
+    if re.search(pattern[pos], text):
+        return True
+    return False
 
 def additional_processing(match, reply=""):
-    pattern = [text[0] for text in eliza_pairs]
-
-    if re.search(pattern[any([34, 35, 36, 40, 41])], match):
-        # Matches with a high risk of ending the conversation
-        # prompt the user with insight into their own feelings
-        # to keep the conversation going
-        if (all(x in reply for x in ['.', '.'])     # checking whether we already added emotional analysis input
-                or all(x in reply for x in ['.', '?']) or all(x in reply for x in ['?', '?'])):
-            return reply
-        else:
-            return "add_emotion"
-    elif re.search(pattern[0], match):
+    if pattern_match(match, 0):
         # Replaces "name" in the "hello" reply string with the user's name
         text = reply.replace("name", user.name)
         return text
-    elif re.search(pattern[1], match):
+    elif pattern_match(match, 1):
         # Replaces "friend" in the reply string with the user's friend's name
 
-        name = extract_name(match)
+        name = ""
+        if extract_name(match):
+            name = extract_name(match)
         user.friend = name
 
         if user.friend.lower() in reply:
@@ -452,9 +448,11 @@ def additional_processing(match, reply=""):
                 text = reply.replace("this friend", user.friend)
         else:
             return reply
-    elif re.search(pattern[2],match):
+    elif pattern_match(match, 2):
         # Replaces "mother" in the reply string with the user's mother's name
-        name = extract_name(match)
+        name = ""
+        if extract_name(match):
+            name = extract_name(match)
         user.mother = name
 
         if user.mother.lower() in reply:
@@ -465,9 +463,11 @@ def additional_processing(match, reply=""):
             return text
         else:
             return reply
-    elif re.search(pattern[3],match):
+    elif pattern_match(match, 3):
         # Replaces "father" in the reply string with the user's father's name
-        name = extract_name(match)
+        name = ""
+        if extract_name(match):
+            name = extract_name(match)
         user.father = name
 
         if user.father.lower() in reply:
@@ -478,9 +478,11 @@ def additional_processing(match, reply=""):
             return text
         else:
             return reply
-    elif re.search(pattern[4],match):
+    elif pattern_match(match, 4):
         # Replaces "sister" in the reply string with the user's sibling's name
-        name = extract_name(match)
+        name = ""
+        if extract_name(match):
+            name = extract_name(match)
         user.sibling = name
 
         if user.sibling.lower() in reply:
@@ -491,9 +493,11 @@ def additional_processing(match, reply=""):
             return text
         else:
             return reply
-    elif re.search(pattern[5],match):
+    elif pattern_match(match, 5):
         # Replaces "brother" in the reply string with the user's sibling's name
-        name = extract_name(match)
+        name = ""
+        if extract_name(match):
+            name = extract_name(match)
         user.sibling = name
 
         if user.sibling.lower() in reply:
@@ -504,7 +508,7 @@ def additional_processing(match, reply=""):
             return text
         else:
             return reply
-    elif re.search(pattern[6], match):
+    elif pattern_match(match, 6):
         # Exit case
         new_user = {
             "name": user.name,

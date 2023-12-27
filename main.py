@@ -46,7 +46,6 @@ def answer(input_text, category="response", sentence="feel", person=""):
                 reply = eliza_replies.additional_processing("Hello", reply)
             else:
                 reply = "Nice to meet you, " + person + "! How are you today?"
-                print(reply)
         elif sentence == "feel":
             emotion_reply = emotion_chat(input_text)
             eliza_reply = chatbot.respond(input_text)
@@ -65,5 +64,6 @@ def user_interface():
             break
         print("Elizabeth: ", end=" "),
         classifySentence(input_text)
+
 
 user_interface()
